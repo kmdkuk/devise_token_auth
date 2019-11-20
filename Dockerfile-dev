@@ -1,0 +1,28 @@
+FROM ruby:2.6.3-alpine
+
+ENV LANG C.UTF-8
+ENV APP_ROOT /usr/src/sweets_api
+RUN mkdir -p $APP_ROOT
+WORKDIR $APP_ROOT
+
+# mysql2のための依存解決
+# timezoneの設定
+# bundle install
+# puma.sockを配置するディレクトリを作成
+RUN apk --no-cache add build-base mariadb-dev && \
+  apk add --update --no-cache tzdata && \
+  cp /usr/share/zoneinfo/Asia/Tokyo /etc/localtime && \
+  echo "Asia/Tokyo" > /etc/timezone
+
+COPY Gemfile $APP_ROOT
+COPY Gemfile.lock $APP_ROOT
+
+ENV BUNDLE_GEMFILE=$APP_ROOT/Gemfile \
+  BUNDLE_JOBS=4
+
+RUN bundle install&& \
+  mkdir -p tmp/sockets
+
+# ホストのアプリケーションディレクトリ内をすべてコンテナにコピー
+COPY . $APP_ROOT
+
