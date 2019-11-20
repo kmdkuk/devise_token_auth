@@ -1,0 +1,47 @@
+version: '3'
+services:
+  mysql:
+    image: mysql:5.7.10
+    env_file: .env
+    volumes:
+      - mysql-data:/var/lib/mysql
+  app: &app_base
+    build:
+      context: .
+      dockerfile: Dockerfile-dev
+    command: bundle exec puma -C config/puma.rb
+    env_file: .env
+    environment:
+      - RAILS_ENV=development
+    stdin_open: true
+    tty: true
+    ports:
+      - '3000:3000'
+    volumes:
+      - .:/usr/src/sweets_api
+      - bundle:/usr/src/bundle
+    depends_on:
+      - mysql
+  spring:
+    <<: *app_base
+    command: bin/spring server
+    ports: []
+  solargraph:
+    <<: *app_base
+    command: bundle exec solargraph socket --host=0.0.0.0 --port=7658
+    ports:
+      - "8091:7658"
+  swagger:
+    image: swaggerapi/swagger-ui
+    volumes:
+      - ./public/apidocs/swagger.yaml:/usr/share/nginx/html/api/swagger.yaml
+    environment:
+      - API_URL=http://localhost:10000/api/swagger.yaml
+    ports:
+      - "10000:8080"
+
+volumes:
+  mysql-data:
+    driver: local
+  bundle:
+    driver: local
