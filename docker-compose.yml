@@ -19,7 +19,7 @@ services:
       - '3000:3000'
     volumes:
       - .:/usr/src/sweets_api
-      - bundle:/usr/src/bundle
+      - bundle:/usr/local/bundle
     depends_on:
       - mysql
   spring:
