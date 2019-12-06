@@ -13,7 +13,7 @@ gem 'mysql2'
 # use sparql
 gem 'sparql'
 # Use Puma as the app server
-gem 'puma', '~> 3.11'
+gem 'puma', '~> 3.12'
 # トークンベースの認証を行うためのgem
 gem 'devise'
 gem 'devise_token_auth'
